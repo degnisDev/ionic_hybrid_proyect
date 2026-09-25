@@ -36,7 +36,7 @@ const Login: React.FC = () => {
           value: 'jwt-dummy-token-degnisdev-12345',
         });
 
-        navigate('/gallery');
+        navigate('/tabs/gallery');
       } else {
         setToastMessage('Credenciales incorrectas');
         setShowToast(true);

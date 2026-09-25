@@ -1,18 +1,17 @@
-import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
+import { IonApp, IonRouterOutlet } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
-import Gallery from './pages/Gallery';
+import Tabs from './pages/Tabs';
 
-setupIonicReact();
 
-// Configuramos las rutas principales de la aplicación con React Router
+// Configuramos las rutas principales de la aplicacion con React Router
 const App: React.FC = () => (
   <IonApp>
     <IonReactRouter>
       <IonRouterOutlet>
         <Route path="/login" element={<Login />} />
-        <Route path="/gallery" element={<Gallery />} />
+        <Route path="/tabs/*" element={<Tabs />} />
         <Route path="/" element={<Navigate to="/login" replace />} />
       </IonRouterOutlet>
     </IonReactRouter>
