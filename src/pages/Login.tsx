@@ -16,7 +16,7 @@ import {
 import { Preferences } from '@capacitor/preferences';
 import { useNavigate } from 'react-router-dom';
 
-// Creamos el componente de Login para gestionar la autenticación y validación de usuarios
+// Pagina de inicio de sesion
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>('degnisdev@gmail.com');
   const [password, setPassword] = useState<string>('12345');
@@ -24,13 +24,12 @@ const Login: React.FC = () => {
   const [toastMessage, setToastMessage] = useState<string>('');
   const navigate = useNavigate();
 
+  // Validamos las credenciales y guardamos el token en el almacenamiento local
   const handleLogin = async () => {
     try {
       if (email === 'degnisdev@gmail.com' && password === '12345') {
-        // Realizamos el consumo de la API REST para validar la autenticación
         await fetch('https://reqres.in/api/users?page=1');
-        
-        // Guardamos el Token JWT en el almacenamiento local del dispositivo
+
         await Preferences.set({
           key: 'jwt_token',
           value: 'jwt-dummy-token-degnisdev-12345',
@@ -42,7 +41,7 @@ const Login: React.FC = () => {
         setShowToast(true);
       }
     } catch (error) {
-      setToastMessage('Error de red al intentar iniciar sesión');
+      setToastMessage('Error de red al intentar iniciar sesion');
       setShowToast(true);
     }
   };
@@ -59,24 +58,21 @@ const Login: React.FC = () => {
           <IonCard>
             <IonCardContent>
               <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Bienvenido</h2>
-              <p style={{ textAlign: 'center', fontSize: '12px', marginBottom: '15px' }}>
-                Usa el API gratuita de reqres.in para validar JWT
-              </p>
-              
+
               <IonItem>
-                <IonLabel position="floating">Correo electrónico</IonLabel>
-                <IonInput 
-                  value={email} 
-                  onIonChange={(e) => setEmail(e.detail.value!)} 
-                  type="email" 
+                <IonLabel position="floating">Correo electronico</IonLabel>
+                <IonInput
+                  value={email}
+                  onIonChange={(e) => setEmail(e.detail.value!)}
+                  type="email"
                 />
               </IonItem>
               <IonItem>
-                <IonLabel position="floating">Contraseña</IonLabel>
-                <IonInput 
-                  value={password} 
-                  onIonChange={(e) => setPassword(e.detail.value!)} 
-                  type="password" 
+                <IonLabel position="floating">Contrasena</IonLabel>
+                <IonInput
+                  value={password}
+                  onIonChange={(e) => setPassword(e.detail.value!)}
+                  type="password"
                 />
               </IonItem>
 

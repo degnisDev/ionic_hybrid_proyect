@@ -19,7 +19,7 @@ import { Preferences } from '@capacitor/preferences';
 
 const CART_KEY = 'myapol_cart';
 
-// Interfaz para los productos del carrito
+// Estructura de datos de un producto en el carrito
 interface Product {
   id: number;
   title: string;
@@ -27,15 +27,24 @@ interface Product {
   image: string;
 }
 
-// Componente del carrito de compras
+// Pagina del carrito de compras
 const Cart: React.FC = () => {
   const [cartItems, setCartItems] = useState<Product[]>([]);
   const [showToast, setShowToast] = useState<boolean>(false);
   const [toastMsg, setToastMsg] = useState<string>('');
 
-  // Cargamos el carrito cuando el componente se monta por primera vez
+  // Cargamos el carrito al iniciar y nos suscribimos a actualizaciones en tiempo real
   useEffect(() => {
     loadCart();
+
+    const handleCartUpdate = () => {
+      loadCart();
+    };
+    window.addEventListener('cart_updated', handleCartUpdate);
+
+    return () => {
+      window.removeEventListener('cart_updated', handleCartUpdate);
+    };
   }, []);
 
   // Recargamos los datos cada vez que el usuario vuelve a esta pestana
@@ -43,7 +52,7 @@ const Cart: React.FC = () => {
     loadCart();
   });
 
-  // Leemos los productos del carrito desde el almacenamiento local
+  // Obtenemos los productos guardados en el almacenamiento local
   const loadCart = async () => {
     const { value } = await Preferences.get({ key: CART_KEY });
     if (value) {
@@ -69,13 +78,13 @@ const Cart: React.FC = () => {
     setShowToast(true);
   };
 
-  // Calculamos el total sumando los precios
+  // Sumamos los precios de todos los productos para obtener el total
   const getTotal = () => {
     const sum = cartItems.reduce((acc, item) => acc + item.price, 0);
     return formatPrice(sum);
   };
 
-  // Funcion para formatear el precio a pesos colombianos
+  // Formateamos el precio en pesos colombianos
   const formatPrice = (price: number) => {
     return '$ ' + price.toLocaleString('es-CO');
   };

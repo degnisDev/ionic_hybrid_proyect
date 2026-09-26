@@ -20,7 +20,7 @@ import { Preferences } from '@capacitor/preferences';
 
 const CART_KEY = 'myapol_cart';
 
-// Definimos la interfaz para los productos locales
+// Estructura de datos de un producto
 interface Product {
   id: number;
   title: string;
@@ -28,7 +28,7 @@ interface Product {
   image: string;
 }
 
-// Lista estatica de tus 10 productos con precios en COP
+// Catalogo de productos locales con precios en pesos colombianos
 const LOCAL_PRODUCTS: Product[] = [
   { id: 1, title: 'Mouse Black', price: 45000, image: '/products/Mouse_black.jpeg' },
   { id: 2, title: 'Mouse Rosa', price: 48000, image: '/products/Mouse_rosa.jpeg' },
@@ -42,12 +42,28 @@ const LOCAL_PRODUCTS: Product[] = [
   { id: 10, title: 'Speaker', price: 150000, image: '/products/speaker.jpeg' }
 ];
 
-// Componente de la tienda donde se muestran los productos
+// Pagina principal de la tienda
 const Shop: React.FC = () => {
   const [showToast, setShowToast] = useState<boolean>(false);
   const [toastMsg, setToastMsg] = useState<string>('');
+  const [discountProduct, setDiscountProduct] = useState<Product | null>(null);
 
-  // Agregamos un producto al carrito y lo guardamos en almacenamiento local
+  // Consultamos la API externa para obtener el producto en descuento
+  React.useEffect(() => {
+    fetch('https://fakestoreapi.com/products/1')
+      .then(res => res.json())
+      .then(data => {
+        setDiscountProduct({
+          id: 999,
+          title: data.title,
+          price: Math.round(data.price * 4000),
+          image: data.image
+        });
+      })
+      .catch(err => console.error('Error al consultar la API', err));
+  }, []);
+
+  // Agregamos el producto seleccionado al carrito en almacenamiento local
   const addToCart = async (product: Product) => {
     const { value } = await Preferences.get({ key: CART_KEY });
     const cart: Product[] = value ? JSON.parse(value) : [];
@@ -55,9 +71,10 @@ const Shop: React.FC = () => {
     await Preferences.set({ key: CART_KEY, value: JSON.stringify(cart) });
     setToastMsg(product.title + ' agregado al carrito');
     setShowToast(true);
+    window.dispatchEvent(new Event('cart_updated'));
   };
 
-  // Funcion para formatear el precio a pesos colombianos
+  // Formateamos el precio en pesos colombianos
   const formatPrice = (price: number) => {
     return '$ ' + price.toLocaleString('es-CO');
   };
@@ -70,6 +87,32 @@ const Shop: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
+
+        {/* Producto en descuento obtenido desde la API */}
+        {discountProduct && (
+          <IonCard style={{ border: '2px solid var(--ion-color-secondary)' }}>
+            <IonCardHeader style={{ paddingBottom: '0' }}>
+              <IonCardTitle style={{ color: 'var(--ion-color-secondary)', fontSize: '15px', fontWeight: 'bold', textAlign: 'center' }}>
+                PRODUCTO CON DESCUENTO !!!
+              </IonCardTitle>
+            </IonCardHeader>
+            <IonImg
+              src={discountProduct.image}
+              style={{ width: '100%', height: '180px', objectFit: 'contain', padding: '10px' }}
+            />
+            <IonCardContent style={{ textAlign: 'center' }}>
+              <h3 style={{ fontSize: '14px', marginBottom: '5px' }}>{discountProduct.title}</h3>
+              <p style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '10px', color: 'var(--ion-color-danger)' }}>
+                {formatPrice(discountProduct.price)}
+              </p>
+              <IonButton color="secondary" expand="block" onClick={() => addToCart(discountProduct)}>
+                Agregar Promocion
+              </IonButton>
+            </IonCardContent>
+          </IonCard>
+        )}
+
+        <h3 style={{ marginLeft: '10px', marginTop: '20px' }}>Catalogo</h3>
         <IonGrid>
           <IonRow>
             {LOCAL_PRODUCTS.map((product) => (
